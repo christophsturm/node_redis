@@ -705,7 +705,7 @@ RedisClient.prototype.end = function () {
 
 function Multi(client, args) {
     this.client = client;
-    this.queue = [["MULTI"]];
+    this.queue = [["MULTI", function () { console.log("WARNING: Error during MULTI command of Multi/Exec") }]];
     if (Array.isArray(args)) {
         this.queue = this.queue.concat(args);
     }
@@ -873,12 +873,17 @@ Multi.prototype.exec = function (callback) {
         this.client.send_command(command, args, function (err, reply) {
             if (err) {
                 var cur = self.queue[index];
-                if (typeof cur[cur.length - 1] === "function") {
-                    cur[cur.length - 1](err);
-                } else {
-                    throw new Error(err);
+
+                if (cur) {
+                  if (typeof cur[cur.length - 1] === "function") {
+                      cur[cur.length - 1](err);
+                  } else {
+                      throw new Error(err);
+                  }
+
+                  // why oh why?
+                  self.queue.splice(index, 1);
                 }
-                self.queue.splice(index, 1);
             }
         });
     }, this);
