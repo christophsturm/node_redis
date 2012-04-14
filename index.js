@@ -881,7 +881,6 @@ Multi.prototype.exec = function (callback) {
                       throw new Error(err);
                   }
 
-                  // why oh why?
                   self.queue.splice(index, 1);
                 }
             }
