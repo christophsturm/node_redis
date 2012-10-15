@@ -576,6 +576,34 @@ Current delay in milliseconds before a connection retry will be attempted.  This
 Multiplier for future retry timeouts.  This should be larger than 1 to add more time between retries.
 Defaults to 1.7.  The default initial connection retry is 250, so the second retry will be 425, followed by 723.5, etc.
 
+### Commands with Optional and Keyword arguments
+
+This applies to anything that uses an optional `[WITHSCORES]` or `[LIMIT offset count]` in the [redis.io/commands](http://redis.io/commands) documentation.
+
+Example:
+```js
+var args = [ 'myzset', 1, 'one', 2, 'two', 3, 'three', 99, 'ninety-nine' ];
+client.zadd(args, function (err, response) {
+    if (err) throw err;
+    console.log('added '+response+' items.');
+
+    // -Infinity and +Infinity also work
+    var args1 = [ 'myzset', '+inf', '-inf' ];
+    client.zrevrangebyscore(args1, function (err, response) {
+        if (err) throw err;
+        console.log('example1', response);
+        // write your code here
+    });
+
+    var max = 3, min = 1, offset = 1, count = 2;
+    var args2 = [ 'myzset', max, min, 'WITHSCORES', 'LIMIT', offset, count ];
+    client.zrevrangebyscore(args2, function (err, response) {
+        if (err) throw err;
+        console.log('example2', response);
+        // write your code here
+    });
+});
+```
 
 ## TODO
 
@@ -588,27 +616,15 @@ Performance can be better for very large values.
 I think there are more performance improvements left in there for smaller values, especially for large lists of small values.
 
 ## How to Contribute
-- make your changes on a fork
-- your code should be the same style as the rest of the code
-- add your tests to `./test.js`
-- add your documentation to `README.md` (if needed).
-- if you think your change will make node_redis slower, run this:
-
-        git checkout master
-        node multi_bench.js > before.txt
-        git checkout branch-with-your-change
-        node multi_bench.js > after.txt
-        ./diff_multi_bench_output.js before.txt after.txt
-
-  and please attach a screenshot of the output (if it's not faster I recommend
-  trying to make it faster!).
-- open a pull request!
+- open a pull request and then wait for feedback (if
+  [DTrejo](http://github.com/dtrejo) does not get back to you within 2 days,
+  comment again with indignation!)
 
 ## Contributors
 Some people have have added features and fixed bugs in `node_redis` other than me.
 
 Ordered by date of first contribution.
-[Auto-generated](http://github.com/dtrejo/node-authors) on Sat Jul 07 2012 16:11:04 GMT-0700 (PDT).
+[Auto-generated](http://github.com/dtrejo/node-authors) on Wed Jul 25 2012 19:14:59 GMT-0700 (PDT).
 
 - [Matt Ranney aka `mranney`](https://github.com/mranney)
 - [Tim-Smart aka `tim-smart`](https://github.com/tim-smart)
@@ -643,6 +659,7 @@ Ordered by date of first contribution.
 - [Dave Peticolas aka `jdavisp3`](https://github.com/jdavisp3)
 - [Trae Robrock aka `trobrock`](https://github.com/trobrock)
 - [Shankar Karuppiah aka `shankar0306`](https://github.com/shankar0306)
+- [Ignacio Burgueño aka `ignacio`](https://github.com/ignacio)
 
 Thanks.
 
